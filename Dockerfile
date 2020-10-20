@@ -11,7 +11,7 @@ WORKDIR /home/app/app
 
 #install kebutuhannya
 COPY composer.json composer.json
-RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader && --no-autoloader && rm -rf /home/app/.composer
+RUN composer install --prefer-dist --no-scripts --no-dev --no-autoloader && rm -rf /home/app/.composer
 
 #copy seluruh file ke working directorynya
 COPY --chown=app:root . ./
