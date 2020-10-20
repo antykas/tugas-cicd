@@ -1,0 +1,36 @@
+os:
+  - linux #OS yang digunakan
+
+language: php #menggunakan PHP
+
+# menggunakan distro yang trusty
+dist: trusty
+
+php: 
+  - '7.1' #versi PHP
+
+services: 
+  - docker #service yang digunakan
+
+# task yang dilakukan
+jobs:
+  include:
+    #tahapan testing
+    - stage: "Tests"
+      name:  "Unit Test PHP"
+      script:
+      - travis_retry composer self-update #melakukan update composer
+      - travis_retry composer install --prefer-source --no-interaction #menginstall dependency composer
+      - cp .env.example .env #membuat file .env (file konfigurasi dari laravel)
+      - vendor/bin/phpunit tests/ExampleTest.php #menjalankan phpunit dari file example test
+    # tahapan build image dan push ke dockerhub
+    - stage: "Build Docker Image" #penamaan stage
+      name: "Build Images Docker" 
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin  #Login Docker
+      - docker build -t travis-ci-build-stages-demo . #build image dari project ini
+      - docker images
+      #kita membuat tag baru untuk image ini (seperti membuat repositori)
+      - docker tag travis-ci-build-stages-demo $DOCKER_USERNAME/tugas-cicd 
+      #kita push ke dockernya
+      - docker push $DOCKER_USERNAME/tugas-cicd
